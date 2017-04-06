@@ -1,8 +1,6 @@
 import React from "react";
 import { hashHistory } from "react-router";
 
-const NOPE = function() {};
-
 class ArchiveEntryForm extends React.Component {
 
     constructor(props) {

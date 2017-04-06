@@ -4,6 +4,7 @@ import HeaderBar from "./HeaderBar";
 import WebDAVArchiveEntryForm from "./WebDAVArchiveEntryForm";
 import DropboxArchiveEntryForm from "./DropboxArchiveEntryForm";
 import OwnCloudArchiveEntryForm from "./OwnCloudArchiveEntryForm";
+import MyButtercupArchiveEntryForm from "./MyButtercupArchiveEntryForm";
 
 class AddArchiveEntry extends React.Component {
 
@@ -13,7 +14,7 @@ class AddArchiveEntry extends React.Component {
 
     render() {
         let FormClass;
-        switch(this.props.params.type) {
+        switch (this.props.params.type) {
             case "webdav": {
                 FormClass = WebDAVArchiveEntryForm;
                 break;
@@ -24,6 +25,10 @@ class AddArchiveEntry extends React.Component {
             }
             case "owncloud": {
                 FormClass = OwnCloudArchiveEntryForm;
+                break;
+            }
+            case "mybuttercup": {
+                FormClass = MyButtercupArchiveEntryForm;
                 break;
             }
 

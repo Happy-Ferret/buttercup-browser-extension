@@ -1,6 +1,7 @@
 import archives from "./archives";
 import dropbox from "./dropboxToken";
 import DropboxAuthenticator from "./DropboxAuthenticator";
+import MyButtercupAuthenticator from "./MyButtercupAuthenticator";
 import { hideContextMenu, showContextMenu } from "./context";
 
 const StorageInterface = window.Buttercup.Web.StorageInterface;
@@ -83,6 +84,25 @@ export default function addListeners() {
                         sendResponse({
                             ok: true,
                             token: dba.token
+                        });
+                    })
+                    .catch(function(err) {
+                        sendResponse({
+                            ok: false,
+                            error: err.message
+                        });
+                        console.error(err);
+                    });
+                return RESPOND_ASYNC;
+            }
+
+            case "authenticate-mybuttercup": {
+                let mba = new MyButtercupAuthenticator();
+                mba.authenticate()
+                    .then(function() {
+                        sendResponse({
+                            ok: true,
+                            token: mba.token
                         });
                     })
                     .catch(function(err) {

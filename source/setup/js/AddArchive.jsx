@@ -19,6 +19,7 @@ class AddArchive extends React.Component {
                 <HeaderBar />
                 <h3>Add archive from source</h3>
                 <ul className="archiveTypeList">
+                    <li className="mybuttercup" onClick={browseTo("mybuttercup")}>My Buttercup</li>
                     <li className="dropbox" onClick={browseTo("dropbox")}>Dropbox</li>
                     <li className="owncloud" onClick={browseTo("owncloud")}>ownCloud</li>
                     <li className="webdav" onClick={browseTo("webdav")}>WebDAV</li>
