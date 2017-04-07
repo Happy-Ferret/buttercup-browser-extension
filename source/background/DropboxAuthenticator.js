@@ -1,5 +1,5 @@
 import Dropbox from "dropbox";
-import dbTools from "./dropboxToken";
+import { clearToken, getToken} from "./oauthToken";
 
 class DropboxAuthenticator {
 
@@ -21,14 +21,14 @@ class DropboxAuthenticator {
     }
 
     authenticate() {
-        dbTools.setToken(null);
+        clearToken();
         this._token = null;
         let callbackURL = "https://buttercup.pw/",
             dropboxURL = this.client.getAuthenticationUrl(callbackURL);
         chrome.tabs.create({ url: dropboxURL });
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             let interval = setInterval(() => {
-                let token = dbTools.getToken();
+                const token = getToken();
                 if (token) {
                     clearInterval(interval);
                     this._token = token;

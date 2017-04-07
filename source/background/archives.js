@@ -6,6 +6,7 @@ const {
     createCredentials,
     WebDAVDatasource,
     OwnCloudDatasource,
+    MyButtercupDatasource,
     Workspace
 } = Buttercup;
 const {
@@ -77,6 +78,9 @@ let archives = {
                     case "owncloud": {
                         return archives.addOwnCloudArchive(request);
                     }
+                    case "mybuttercup": {
+                        return archives.addMyButtercupArchive(request);
+                    }
 
                     default:
                         throw new Error(`Unknown archive type: ${request.type}`);
@@ -100,6 +104,45 @@ let archives = {
                 let datasource = new DropboxDatasource(
                     request.dropbox_token,
                     request.dropbox_path
+                );
+                if (request.connect === "new") {
+                    let workspace = new Workspace();
+                    workspace.setPrimaryArchive(
+                        Archive.createWithDefaults(),
+                        datasource,
+                        createCredentials.fromPassword(request.master_password)
+                    );
+                    return workspace
+                        .save()
+                        .then(() => [workspace, credentials]);
+                }
+                return archives
+                    .fetchWorkspace(
+                        datasource,
+                        createCredentials.fromPassword(request.master_password)
+                    )
+                    .then(workspace => [workspace, credentials]);
+            })
+            .then(([workspace, credentials] = []) =>
+                validateAndSave(request.name, workspace, credentials, request.master_password));
+    },
+
+    addMyButtercupArchive: function(request) {
+        return Promise
+            .resolve()
+            .then(function() {
+                let mybuttercupCreds = createCredentials("mybuttercup");
+                mybuttercupCreds.setValue("datasource", JSON.stringify({
+                    type: "mybuttercup",
+                    token: request.mybuttercup_token,
+                    archiveID: request.mybuttercup_archiveid
+                }));
+                return mybuttercupCreds;
+            })
+            .then(function(credentials) {
+                let datasource = new MyButtercupDatasource(
+                    request.mybuttercup_archiveid,
+                    request.mybuttercup_token
                 );
                 if (request.connect === "new") {
                     let workspace = new Workspace();

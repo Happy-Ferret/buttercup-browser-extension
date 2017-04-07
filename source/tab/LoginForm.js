@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 
-import Popup from "./popup";
+import Popup from "./Popup";
 import authentication from "./authentication";
 import submissions from "./submissions";
 
@@ -69,7 +69,9 @@ function generateFormID() {
 class LoginForm extends EventEmitter {
 
     constructor(form) {
+        console.log("NEW");
         super();
+        console.log("NEW FORM", form);
         this._id = generateFormID();
         __forms[this._id] = this;
         form.setAttribute("data-buttercup-form-id", this._id);
@@ -80,6 +82,7 @@ class LoginForm extends EventEmitter {
         this._popup = new Popup(this);
         this.locateKnownInputs();
         this.popup.on("entryClick", (data) => this.onEntryClick(data));
+        console.log("ADD LISTENER", form);
         form.addEventListener("submit", (e) => this.onFormSubmit(e), false);
     }
 
@@ -176,6 +179,7 @@ class LoginForm extends EventEmitter {
 
     onFormSubmit() {
         let values = this.fetchValues();
+        console.log("SUBMIT!!", values);
         submissions.trackFormData(values);
         this.emit("formSubmission");
     }

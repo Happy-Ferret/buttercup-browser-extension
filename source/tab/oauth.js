@@ -8,7 +8,7 @@ export function processAccessToken(fragment) {
         let [ key, value ] = blocks[i].split("=");
         if (key === "access_token") {
             chrome.runtime.sendMessage({
-                command: "set-dropbox-token",
+                command: "set-token",
                 token: value
             }, NOPE);
             setTimeout(function() {

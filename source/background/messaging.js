@@ -1,5 +1,5 @@
 import archives from "./archives";
-import dropbox from "./dropboxToken";
+import { setToken, setTokenType } from "./oauthToken";
 import DropboxAuthenticator from "./DropboxAuthenticator";
 import MyButtercupAuthenticator from "./MyButtercupAuthenticator";
 import { hideContextMenu, showContextMenu } from "./context";
@@ -218,6 +218,7 @@ export default function addListeners() {
 
             case "save-form-submission": {
                 let matchingEntries = getEntriesForURL(request.data.url);
+                console.log("SAVE FORM SUB", request.data, matchingEntries <= 0);
                 if (matchingEntries <= 0) {
                     StorageInterface.setData("lastSubmission", request.data);
                 }
@@ -266,8 +267,13 @@ export default function addListeners() {
                 return RESPOND_ASYNC;
             }
 
-            case "set-dropbox-token": {
-                dropbox.setToken(request.token);
+            case "set-token": {
+                setToken(request.token);
+                break;
+            }
+
+            case "set-token-type": {
+                setTokenType(request.type);
                 break;
             }
 

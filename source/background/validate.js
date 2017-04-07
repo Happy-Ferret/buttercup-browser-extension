@@ -29,8 +29,13 @@ let validate = {
                 break;
             }
 
+            case "mybuttercup": {
+                validate.validateObjectString(request, "mybuttercup_token");
+                break;
+            }
+
             default:
-                throw new Error(`Unknown archive type: ${request.type}`);
+                throw new Error(`Validation failed: Unknown archive type: ${request.type}`);
         }
     },
 

@@ -18,6 +18,7 @@ addListeners();
             })
             .catch(function(err) {
                 console.error(`An error occurred while updating: ${err.message}`);
+                console.log(err);
                 autoUpdate();
             });
     }, UPDATE_EVERY_MINUTES * 60 * 1000);

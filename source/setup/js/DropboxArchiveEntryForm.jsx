@@ -6,6 +6,8 @@ import anyFs from "any-fs";
 import ArchiveEntryForm from "./ArchiveEntryForm";
 import ConnectArchiveDialog from "./ConnectArchiveDialog";
 
+const NOPE = function() {};
+
 class DropboxArchiveEntryForm extends ArchiveEntryForm {
 
     componentWillMount() {
@@ -35,6 +37,10 @@ class DropboxArchiveEntryForm extends ArchiveEntryForm {
     onAuthenticateClicked(event) {
         event.preventDefault();
         this.enable(false);
+        chrome.runtime.sendMessage({
+            command: "set-token-type",
+            type: "dropbox"
+        }, NOPE);
         chrome.runtime.sendMessage({ command: "authenticate-dropbox" }, (response) => {
             if (response && response.ok === true) {
                 this.onAuthenticated(response.token);

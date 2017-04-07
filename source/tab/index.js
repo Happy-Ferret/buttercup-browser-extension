@@ -2,7 +2,7 @@ import FormFinder from "./FormFinder";
 import submissions from "./submissions";
 import addListeners from "./messaging";
 import { placeStylesheet } from "../common/styles";
-import { processAccessToken } from "./dropbox";
+import { processAccessToken } from "./oauth";
 import { hideContextMenu, showContextMenu } from "./context";
 import LoginForm from "./LoginForm";
 
