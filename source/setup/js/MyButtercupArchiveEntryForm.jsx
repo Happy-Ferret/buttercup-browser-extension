@@ -1,4 +1,5 @@
 import React from "react";
+import { RadioGroup, RadioButton } from "react-radio-buttons";
 
 import ArchiveEntryForm from "./ArchiveEntryForm";
 
@@ -94,25 +95,25 @@ class MyButtercupArchiveEntryForm extends ArchiveEntryForm {
                         Authenticate My Buttercup account
                     </button>
                 </div>
-                <div className="row">
-                    {this.state.archives.length > 0 ?
-                        <div>
+                {this.state.archives.length > 0 ?
+                    <div>
+                        <div className="row">
                             <span>Choose an archive:</span>
-                            <ul>
+                        </div>
+                        <div className="row">
+                            <RadioGroup onChange={ this.onChange }>
                                 {this.state.archives.map(archive =>
-                                    <li>
-                                        <input
-                                            type="radio"
-                                            name="mybuttercup_archiveid"
-                                            value={archive.id}
-                                            checked={this.state.mybuttercup_archiveid === archive.id}
-                                            />
-                                        &nbsp;{archive.name}
-                                    </li>
+                                    <RadioButton
+                                        value={archive.id}
+                                        rootColor="#00b7ac"
+                                        pointColor="#00b7ac"
+                                        >
+                                        {archive.name}
+                                    </RadioButton>
                                 )}
-                            </ul>
-                        </div> : ""}
-                </div>
+                            </RadioGroup>
+                        </div>
+                    </div> : ""}
                 <input type="hidden" name="mybuttercup_token" value={this.state.mybuttercup_token} />
             </div>
         );
