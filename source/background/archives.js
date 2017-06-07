@@ -1,4 +1,7 @@
 import validation from "./validate.js";
+import {
+    sharedManager
+} from "./archiveManagement.js";
 
 const Buttercup = window.Buttercup;
 const {
@@ -25,7 +28,7 @@ function generateEntryPath(entry) {
 }
 
 function getArchiveManager() {
-    return Buttercup.Web.ArchiveManager.getSharedManager();
+    return sharedManager;
 }
 
 function groupToSkeleton(item, isGroup) {
@@ -45,20 +48,16 @@ function groupToSkeleton(item, isGroup) {
     };
 }
 
-function validateAndSave(name, workspace, storageCredentials, password) {
+function validateAndSave(name, storageCredentials, password) {
     const archiveManager = getArchiveManager();
-    return Promise
-        .resolve(workspace)
-        .then(validation.validateWorkspace)
-        .then(function() {
-            archiveManager.addArchive(
-                name,
-                workspace,
-                storageCredentials,
-                password
-            );
-            return archiveManager.saveState();
-        });
+    return archiveManager
+        .addSource(
+            name,
+            storageCredentials,
+            createCredentials.fromPassword(password),
+            false // @todo
+        )
+        .then(id => archiveManager.dehydrateSource(id));
 }
 
 const archives = {
@@ -84,43 +83,54 @@ const archives = {
             });
     },
 
-    addDropboxArchive: function(request) {
-        return Promise
-            .resolve(request)
-            .then(function() {
-                let dropboxCreds = createCredentials("dropbox");
-                dropboxCreds.setValue("datasource", JSON.stringify({
-                    type: "dropbox",
-                    token: request.dropbox_token,
-                    path: request.dropbox_path
-                }));
-                return dropboxCreds;
-            })
-            .then(function(credentials) {
-                let datasource = new DropboxDatasource(
-                    request.dropbox_token,
-                    request.dropbox_path
-                );
-                if (request.connect === "new") {
-                    let workspace = new Workspace();
-                    workspace.setPrimaryArchive(
-                        Archive.createWithDefaults(),
-                        datasource,
-                        createCredentials.fromPassword(request.masterPassword)
-                    );
-                    return workspace
-                        .save()
-                        .then(() => [workspace, credentials]);
-                }
-                return archives
-                    .fetchWorkspace(
-                        datasource,
-                        createCredentials.fromPassword(request.masterPassword)
-                    )
-                    .then(workspace => [workspace, credentials]);
-            })
-            .then(([workspace, credentials] = []) =>
-                validateAndSave(request.name, workspace, credentials, request.masterPassword));
+    addDropboxArchive(request) {
+        const dropboxCreds = createCredentials("dropbox");
+        dropboxCreds.setValue("datasource", JSON.stringify({
+            type: "dropbox",
+            token: request.dropbox_token,
+            path: request.dropbox_path
+        }));
+        return validateAndSave(request.name, dropboxCreds, request.masterPassword);
+
+        // return Promise
+        //     .resolve(request)
+        //     .then(function() {
+        //         const dropboxCreds = createCredentials("dropbox");
+        //         dropboxCreds.setValue("datasource", JSON.stringify({
+        //             type: "dropbox",
+        //             token: request.dropbox_token,
+        //             path: request.dropbox_path
+        //         }));
+        //         return dropboxCreds;
+        //     })
+        //     .then(function __addToManager(credentials) {
+        //         return validateAndSave(request.name, credentials, request.masterPassword);
+        //     });
+            // .then(function(credentials) {
+            //     let datasource = new DropboxDatasource(
+            //         request.dropbox_token,
+            //         request.dropbox_path
+            //     );
+            //     if (request.connect === "new") {
+            //         let workspace = new Workspace();
+            //         workspace.setPrimaryArchive(
+            //             Archive.createWithDefaults(),
+            //             datasource,
+            //             createCredentials.fromPassword(request.masterPassword)
+            //         );
+            //         return workspace
+            //             .save()
+            //             .then(() => [workspace, credentials]);
+            //     }
+            //     return archives
+            //         .fetchWorkspace(
+            //             datasource,
+            //             createCredentials.fromPassword(request.masterPassword)
+            //         )
+            //         .then(workspace => [workspace, credentials]);
+            // })
+            // .then(([workspace, credentials] = []) =>
+                // validateAndSave(request.name, workspace, credentials, request.masterPassword));
     },
 
     addOwnCloudArchive: function(request) {
@@ -250,7 +260,12 @@ const archives = {
     },
 
     getArchiveList: function() {
-        return getArchiveManager().displayList;
+        return getArchiveManager().sources
+            .map(source => ({
+                type: source.type,
+                status: source.status,
+                name: source.name
+            }));
     },
 
     getEntry: function(archiveID, entryID) {

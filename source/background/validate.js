@@ -1,11 +1,13 @@
-let validate = {
+import { sharedManager } from "./archiveManagement.js";
+
+const validate = {
 
     archiveNameAvailable: function(name) {
-        return Buttercup.Web.ArchiveManager.getSharedManager().archives.hasOwnProperty(name) === false;
+        return sharedManager.sources.map(source => source.name).includes(name) === false;
     },
 
     validateArchiveAddition: function(request) {
-        let { name } = request;
+        const { name } = request;
         if (validate.archiveNameAvailable(name) !== true) {
             throw new Error(`Name is already taken: ${name}`);
         }
@@ -46,7 +48,7 @@ let validate = {
         if (!workspace) {
             throw new Error("Workspace is undefined");
         }
-        let { archive, datasource /* , password */ } = workspace.primary;
+        const { archive, datasource /* , password */ } = workspace.primary;
         try {
             archive.getGroups();
         } catch (err) {

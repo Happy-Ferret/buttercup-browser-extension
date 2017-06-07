@@ -106,7 +106,7 @@ export default function addListeners() {
             }
 
             case "get-archive-states": {
-                let states = archives.getArchiveList();
+                const states = archives.getArchiveList();
                 sendResponse(states);
                 break;
             }
